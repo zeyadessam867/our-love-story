@@ -1511,6 +1511,7 @@ textarea.form-control {
 /* The actual letter content wrapper */
 .story-sheet-container {
     display: none;
+    position: relative;
     opacity: 0;
     transform: translateY(60px) scale(0.95);
     transition: opacity 1s cubic-bezier(0.25, 1, 0.5, 1), 
