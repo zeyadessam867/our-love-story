@@ -287,6 +287,17 @@ function renderStory(chapters) {
             `;
         }
 
+        const alignClass = ch.alignment === 'right' ? 'align-right' : (ch.alignment === 'center' ? 'align-center' : 'align-left');
+
+        let bgStyle = '';
+        if (sectionNum % 3 === 1) {
+            bgStyle = 'background: linear-gradient(160deg, var(--bg-deep) 0%, var(--bg-mid) 50%, var(--bg-surface) 100%) !important;';
+        } else if (sectionNum % 3 === 2) {
+            bgStyle = 'background: linear-gradient(160deg, var(--bg-surface) 0%, var(--bg-mid) 50%, var(--bg-deep) 100%) !important;';
+        } else {
+            bgStyle = 'background: linear-gradient(160deg, var(--bg-deep) 0%, var(--bg-surface) 50%, var(--bg-mid) 100%) !important;';
+        }
+
         if (ch.isFinal) {
             // Render Final Chapter Layout
             html += `
@@ -295,41 +306,76 @@ function renderStory(chapters) {
                 <canvas class="confetti-canvas" id="confettiCanvas"></canvas>
                 <div class="section-particles"></div>
                 <div class="story-container">
-                    <div class="story-sheet" style="padding-top: 50px;">
-                        <div class="chapter-header slide-left" style="justify-content:center; text-align:center; margin-bottom: 32px;">
-                            <div class="chapter-meta" style="text-align:center;">
-                                <div class="chapter-badge" style="margin:0 auto 12px;"><span>∞</span></div>
-                                <div class="chapter-label">${ch.label || 'Forever'}</div>
-                                <h2 class="story-title glowing-text">${ch.title}</h2>
+                    <div class="envelope-wrapper" id="envelope-wrapper-${sectionNum}">
+                        <!-- Clickable Envelope -->
+                        <div class="envelope-interactive" onclick="openEnvelope(${sectionNum})">
+                            <div class="envelope-inside"></div>
+                            <div class="envelope-flap"></div>
+                            <div class="envelope-front-folds">
+                                <div class="envelope-fold-left"></div>
+                                <div class="envelope-fold-right"></div>
+                                <div class="envelope-fold-bottom"></div>
+                            </div>
+                            <div class="wax-seal"></div>
+                            <div class="envelope-label">
+                                <span>Forever</span>
+                                <small>Click to Open</small>
                             </div>
                         </div>
-                        <div class="story-content final-content">
-                            <div class="story-image-wrapper slide-up">
-                                <div class="image-frame final-frame tilt-card">
-                                    <div class="image-border-glow"></div>
-                                    <img src="${ch.image}" alt="${ch.title}" class="story-image" loading="lazy">
-                                    <div class="image-shimmer"></div>
-                                    <div class="image-vignette"></div>
+
+                        <!-- Scrapbook Collage -->
+                        <div class="scrapbook-collage ${alignClass}">
+                            <!-- Polaroid 1: Main Photo -->
+                            <div class="polaroid-card polaroid-1">
+                                <div class="polaroid-img-wrapper">
+                                    <img src="${ch.image}" alt="${ch.title}">
                                 </div>
+                                <div class="polaroid-caption">${ch.label || 'Forever'}</div>
                             </div>
-                            <div class="story-text slide-up final-text">
-                                ${ch.quote ? `<p class="story-quote final-quote">"${ch.quote}"</p>` : ''}
-                                ${ch.paragraphs.map(p => `<p>${p}</p>`).join('')}
-                                
-                                <div class="mini-counter">
-                                    <div class="mini-item"><span class="mini-counter-value" id="miniDays">0</span><small>d</small></div>
-                                    <div class="mini-item"><span class="mini-counter-value" id="miniHours">00</span><small>h</small></div>
-                                    <div class="mini-item"><span class="mini-counter-value" id="miniMinutes">00</span><small>m</small></div>
-                                    <div class="mini-item"><span class="mini-counter-value" id="miniSeconds">00</span><small>s</small></div>
+                            <!-- Polaroid 2: Love Note -->
+                            <div class="polaroid-card polaroid-2">
+                                <div class="polaroid-img-wrapper love-note-bg">
+                                    <div class="love-note-content">
+                                        <span class="note-stamp">🌸</span>
+                                        <p class="note-text">"Every tick of this clock is a heartbeat dedicated to you."</p>
+                                        <span class="note-signature">♥</span>
+                                    </div>
                                 </div>
-                                
-                                <p class="final-declaration">This is not just our story so far.<br>This is the beginning of <span class="shimmer-word">forever.</span> 💕</p>
-                                <div class="final-signature">
-                                    <span class="sig-line"></span>
-                                    <span class="signature-text">With all my love,</span>
-                                    <span class="signature-heart">♥</span>
-                                    <span class="signature-text">Forever yours</span>
-                                    <span class="sig-line"></span>
+                                <div class="polaroid-caption">Forever Yours</div>
+                            </div>
+                        </div>
+
+                        <!-- Unfolded Letter -->
+                        <div class="story-sheet-container">
+                            <div class="story-sheet" style="padding-top: 50px;">
+                                <div class="chapter-header" style="justify-content:center; text-align:center; margin-bottom: 32px;">
+                                    <div class="chapter-meta" style="text-align:center;">
+                                        <div class="chapter-badge" style="margin:0 auto 12px;"><span>∞</span></div>
+                                        <div class="chapter-label">${ch.label || 'Forever'}</div>
+                                        <h2 class="story-title glowing-text">${ch.title}</h2>
+                                    </div>
+                                </div>
+                                <div class="story-content final-content">
+                                    <div class="story-text final-text" style="width: 100%; text-align: center;">
+                                        ${ch.quote ? `<p class="story-quote final-quote">"${ch.quote}"</p>` : ''}
+                                        ${ch.paragraphs.map(p => `<p>${p}</p>`).join('')}
+                                        
+                                        <div class="mini-counter">
+                                            <div class="mini-item"><span class="mini-counter-value" id="miniDays">0</span><small>d</small></div>
+                                            <div class="mini-item"><span class="mini-counter-value" id="miniHours">00</span><small>h</small></div>
+                                            <div class="mini-item"><span class="mini-counter-value" id="miniMinutes">00</span><small>m</small></div>
+                                            <div class="mini-item"><span class="mini-counter-value" id="miniSeconds">00</span><small>s</small></div>
+                                        </div>
+                                        
+                                        <p class="final-declaration">This is not just our story so far.<br>This is the beginning of <span class="shimmer-word">forever.</span> 💕</p>
+                                        <div class="final-signature">
+                                            <span class="sig-line"></span>
+                                            <span class="signature-text">With all my love,</span>
+                                            <span class="signature-heart">♥</span>
+                                            <span class="signature-text">Forever yours</span>
+                                            <span class="sig-line"></span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -338,50 +384,66 @@ function renderStory(chapters) {
             </section>
             `;
         } else {
-            // Render Standard Chapter Layout
-            const alignClass = ch.alignment === 'right' ? 'breakout-image-right' : 'breakout-image-left';
-            const reverseClass = ch.alignment === 'right' ? 'reverse' : '';
-            const slideHeaderClass = ch.alignment === 'right' ? 'slide-right' : 'slide-left';
-            const slideTextClass = ch.alignment === 'right' ? 'slide-right' : 'slide-left';
-            const slideImageClass = ch.alignment === 'right' ? 'slide-left' : 'slide-right';
-            
-            let bgStyle = '';
-            if (sectionNum % 3 === 1) {
-                bgStyle = 'background: linear-gradient(160deg, var(--bg-deep) 0%, var(--bg-mid) 50%, var(--bg-surface) 100%) !important;';
-            } else if (sectionNum % 3 === 2) {
-                bgStyle = 'background: linear-gradient(160deg, var(--bg-surface) 0%, var(--bg-mid) 50%, var(--bg-deep) 100%) !important;';
-            } else {
-                bgStyle = 'background: linear-gradient(160deg, var(--bg-deep) 0%, var(--bg-surface) 50%, var(--bg-mid) 100%) !important;';
-            }
-
+            // Render Standard Chapter Layout with Envelope Wrapper
             html += `
             <section class="section story-section" id="section-${sectionNum}" data-accent="${ch.accent || '207, 156, 180'}">
                 <div class="section-bg" style="${bgStyle}"></div>
                 <div class="section-particles"></div>
                 <div class="story-container">
-                    <div class="story-sheet">
-                        <div class="chapter-header ${slideHeaderClass}">
-                            <div class="chapter-badge"><span>${ch.num || String(sectionNum).padStart(2, '0')}</span></div>
-                            <div class="chapter-meta">
-                                <div class="chapter-label">${ch.label || ('Chapter ' + sectionNum)}</div>
-                                <h2 class="story-title glowing-text">${ch.title}</h2>
+                    <div class="envelope-wrapper" id="envelope-wrapper-${sectionNum}">
+                        <!-- Clickable Envelope -->
+                        <div class="envelope-interactive" onclick="openEnvelope(${sectionNum})">
+                            <div class="envelope-inside"></div>
+                            <div class="envelope-flap"></div>
+                            <div class="envelope-front-folds">
+                                <div class="envelope-fold-left"></div>
+                                <div class="envelope-fold-right"></div>
+                                <div class="envelope-fold-bottom"></div>
+                            </div>
+                            <div class="wax-seal"></div>
+                            <div class="envelope-label">
+                                <span>Chapter ${ch.num || String(sectionNum).padStart(2, '0')}</span>
+                                <small>Click to Open</small>
                             </div>
                         </div>
-                        <div class="story-content ${reverseClass}">
-                            <div class="story-image-wrapper ${slideImageClass} ${alignClass}">
-                                <div class="image-frame tilt-card">
-                                    <div class="image-border-glow"></div>
-                                    <img src="${ch.image}" alt="${ch.title}" class="story-image" loading="lazy">
-                                    <div class="image-shimmer"></div>
-                                    <div class="image-vignette"></div>
+
+                        <!-- Scrapbook Collage -->
+                        <div class="scrapbook-collage ${alignClass}">
+                            <!-- Polaroid 1: Main Photo -->
+                            <div class="polaroid-card polaroid-1">
+                                <div class="polaroid-img-wrapper">
+                                    <img src="${ch.image}" alt="${ch.title}">
                                 </div>
-                                <div class="image-reflection">
-                                    <img src="${ch.image}" alt="" class="reflection-img" loading="lazy">
-                                </div>
+                                <div class="polaroid-caption">${ch.label || ('Chapter ' + sectionNum)}</div>
                             </div>
-                            <div class="story-text ${slideTextClass}">
-                                ${ch.quote ? `<p class="story-quote">"${ch.quote}"</p>` : ''}
-                                ${ch.paragraphs.map(p => `<p>${p}</p>`).join('')}
+                            <!-- Polaroid 2: Love Note -->
+                            <div class="polaroid-card polaroid-2">
+                                <div class="polaroid-img-wrapper love-note-bg">
+                                    <div class="love-note-content">
+                                        <span class="note-stamp">🌸</span>
+                                        <p class="note-text">${ch.quote ? `"${ch.quote}"` : 'You are my absolute favorite memory.'}</p>
+                                        <span class="note-signature">♥</span>
+                                    </div>
+                                </div>
+                                <div class="polaroid-caption">Forever & Always</div>
+                            </div>
+                        </div>
+
+                        <!-- Unfolded Letter -->
+                        <div class="story-sheet-container">
+                            <div class="story-sheet">
+                                <div class="chapter-header">
+                                    <div class="chapter-badge"><span>${ch.num || String(sectionNum).padStart(2, '0')}</span></div>
+                                    <div class="chapter-meta">
+                                        <div class="chapter-label">${ch.label || ('Chapter ' + sectionNum)}</div>
+                                        <h2 class="story-title glowing-text">${ch.title}</h2>
+                                    </div>
+                                </div>
+                                <div class="story-content">
+                                    <div class="story-text">
+                                        ${ch.paragraphs.map(p => `<p>${p}</p>`).join('')}
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -392,6 +454,57 @@ function renderStory(chapters) {
     });
 
     container.innerHTML = html;
+}
+
+// Global functions for interactive envelope actions
+window.openEnvelope = function(num) {
+    const wrapper = document.getElementById(`envelope-wrapper-${num}`);
+    if (wrapper && !wrapper.classList.contains('opened')) {
+        wrapper.classList.add('opened');
+        const container = wrapper.querySelector('.story-sheet-container');
+        if (container) {
+            container.style.display = 'block';
+            void container.offsetHeight; // Force reflow
+            container.classList.add('active');
+            
+            // Stagger reveal of content inside the letter card
+            const elementsToReveal = container.querySelectorAll('.fade-in, .slide-left, .slide-right, .slide-up, .story-text, .reveal-text, .glowing-text');
+            elementsToReveal.forEach((el, index) => {
+                setTimeout(() => {
+                    el.classList.add('visible');
+                }, index * 100 + 400); // Trigger after envelope flap opens and polaroids fly
+            });
+        }
+        spawnEnvelopeHearts(wrapper);
+    }
+};
+
+function spawnEnvelopeHearts(wrapper) {
+    for (let i = 0; i < 15; i++) {
+        const heart = document.createElement('div');
+        heart.className = 'floating-heart-particle';
+        heart.innerHTML = ['♥', '♡', '💕', '🌸'][Math.floor(Math.random() * 4)];
+        
+        // Random position near the center of the envelope
+        heart.style.left = `calc(50% + ${Math.random() * 100 - 50}px)`;
+        heart.style.top = `calc(50% + ${Math.random() * 60 - 30}px)`;
+        
+        // Random transition parameters
+        const duration = Math.random() * 1.5 + 1; // 1s to 2.5s
+        const flyX = Math.random() * 200 - 100; // -100px to 100px
+        const flyY = -Math.random() * 150 - 100; // -100px to -250px
+        const scale = Math.random() * 0.8 + 0.6;
+        
+        heart.style.setProperty('--fly-x', `${flyX}px`);
+        heart.style.setProperty('--fly-y', `${flyY}px`);
+        heart.style.setProperty('--duration', `${duration}s`);
+        heart.style.setProperty('--scale', scale);
+        
+        wrapper.appendChild(heart);
+        
+        // Remove after animation finishes
+        setTimeout(() => heart.remove(), duration * 1000);
+    }
 }
 
 function renderNavDots(chapters) {
