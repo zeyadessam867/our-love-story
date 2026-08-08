@@ -1377,7 +1377,7 @@ textarea.form-control {
     position: absolute;
     inset: 0;
     pointer-events: none;
-    z-index: 10;
+    z-index: 22;
 }
 
 .polaroid-card {
