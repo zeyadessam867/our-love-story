@@ -323,28 +323,6 @@ function renderStory(chapters) {
                             </div>
                         </div>
 
-                        <!-- Scrapbook Collage -->
-                        <div class="scrapbook-collage ${alignClass}">
-                            <!-- Polaroid 1: Main Photo -->
-                            <div class="polaroid-card polaroid-1">
-                                <div class="polaroid-img-wrapper">
-                                    <img src="${ch.image}" alt="${ch.title}">
-                                </div>
-                                <div class="polaroid-caption">${ch.label || 'Forever'}</div>
-                            </div>
-                            <!-- Polaroid 2: Love Note -->
-                            <div class="polaroid-card polaroid-2">
-                                <div class="polaroid-img-wrapper love-note-bg">
-                                    <div class="love-note-content">
-                                        <span class="note-stamp">🌸</span>
-                                        <p class="note-text">"Every tick of this clock is a heartbeat dedicated to you."</p>
-                                        <span class="note-signature">♥</span>
-                                    </div>
-                                </div>
-                                <div class="polaroid-caption">Forever Yours</div>
-                            </div>
-                        </div>
-
                         <!-- Unfolded Letter -->
                         <div class="story-sheet-container">
                             <div class="story-sheet" style="padding-top: 50px;">
@@ -355,7 +333,29 @@ function renderStory(chapters) {
                                         <h2 class="story-title glowing-text">${ch.title}</h2>
                                     </div>
                                 </div>
-                                <div class="story-content final-content">
+                                <div class="story-content final-content" style="display: flex; flex-direction: column; align-items: center; gap: 30px;">
+                                    <!-- Scrapbook Collage (Centered) -->
+                                    <div class="scrapbook-collage align-center">
+                                        <!-- Polaroid 1: Main Photo -->
+                                        <div class="polaroid-card polaroid-1">
+                                            <div class="polaroid-img-wrapper">
+                                                <img src="${ch.image}" alt="${ch.title}">
+                                            </div>
+                                            <div class="polaroid-caption">${ch.label || 'Forever'}</div>
+                                        </div>
+                                        <!-- Polaroid 2: Love Note -->
+                                        <div class="polaroid-card polaroid-2">
+                                            <div class="polaroid-img-wrapper love-note-bg">
+                                                <div class="love-note-content">
+                                                    <span class="note-stamp">🌸</span>
+                                                    <p class="note-text">"Every tick of this clock is a heartbeat dedicated to you."</p>
+                                                    <span class="note-signature">♥</span>
+                                                </div>
+                                            </div>
+                                            <div class="polaroid-caption">Forever Yours</div>
+                                        </div>
+                                    </div>
+
                                     <div class="story-text final-text" style="width: 100%; text-align: center;">
                                         ${ch.quote ? `<p class="story-quote final-quote">"${ch.quote}"</p>` : ''}
                                         ${ch.paragraphs.map(p => `<p>${p}</p>`).join('')}
@@ -385,6 +385,7 @@ function renderStory(chapters) {
             `;
         } else {
             // Render Standard Chapter Layout with Envelope Wrapper
+            const reverseClass = ch.alignment === 'right' ? 'reverse' : '';
             html += `
             <section class="section story-section" id="section-${sectionNum}" data-accent="${ch.accent || '207, 156, 180'}">
                 <div class="section-bg" style="${bgStyle}"></div>
@@ -407,28 +408,6 @@ function renderStory(chapters) {
                             </div>
                         </div>
 
-                        <!-- Scrapbook Collage -->
-                        <div class="scrapbook-collage ${alignClass}">
-                            <!-- Polaroid 1: Main Photo -->
-                            <div class="polaroid-card polaroid-1">
-                                <div class="polaroid-img-wrapper">
-                                    <img src="${ch.image}" alt="${ch.title}">
-                                </div>
-                                <div class="polaroid-caption">${ch.label || ('Chapter ' + sectionNum)}</div>
-                            </div>
-                            <!-- Polaroid 2: Love Note -->
-                            <div class="polaroid-card polaroid-2">
-                                <div class="polaroid-img-wrapper love-note-bg">
-                                    <div class="love-note-content">
-                                        <span class="note-stamp">🌸</span>
-                                        <p class="note-text">${ch.quote ? `"${ch.quote}"` : 'You are my absolute favorite memory.'}</p>
-                                        <span class="note-signature">♥</span>
-                                    </div>
-                                </div>
-                                <div class="polaroid-caption">Forever & Always</div>
-                            </div>
-                        </div>
-
                         <!-- Unfolded Letter -->
                         <div class="story-sheet-container">
                             <div class="story-sheet">
@@ -439,7 +418,28 @@ function renderStory(chapters) {
                                         <h2 class="story-title glowing-text">${ch.title}</h2>
                                     </div>
                                 </div>
-                                <div class="story-content">
+                                <div class="story-content ${reverseClass}">
+                                    <!-- Scrapbook Collage (Photos side-by-side with words) -->
+                                    <div class="scrapbook-collage">
+                                        <!-- Polaroid 1: Main Photo -->
+                                        <div class="polaroid-card polaroid-1">
+                                            <div class="polaroid-img-wrapper">
+                                                <img src="${ch.image}" alt="${ch.title}">
+                                            </div>
+                                            <div class="polaroid-caption">${ch.label || ('Chapter ' + sectionNum)}</div>
+                                        </div>
+                                        <!-- Polaroid 2: Love Note -->
+                                        <div class="polaroid-card polaroid-2">
+                                            <div class="polaroid-img-wrapper love-note-bg">
+                                                <div class="love-note-content">
+                                                    <span class="note-stamp">🌸</span>
+                                                    <p class="note-text">${ch.quote ? `"${ch.quote}"` : 'You are my absolute favorite memory.'}</p>
+                                                    <span class="note-signature">♥</span>
+                                                </div>
+                                            </div>
+                                            <div class="polaroid-caption">Forever & Always</div>
+                                        </div>
+                                    </div>
                                     <div class="story-text">
                                         ${ch.paragraphs.map(p => `<p>${p}</p>`).join('')}
                                     </div>
