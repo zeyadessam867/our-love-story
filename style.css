@@ -1384,10 +1384,10 @@ textarea.form-control {
 
 .polaroid-card {
     position: absolute;
-    width: 180px;
-    padding: 10px 10px 20px 10px;
+    width: 220px;
+    padding: 12px 12px 24px 12px;
     background: #fff;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.25);
     border-radius: 4px;
     opacity: 0;
     left: 50%;
@@ -1400,7 +1400,7 @@ textarea.form-control {
 
 .polaroid-img-wrapper {
     width: 100%;
-    height: 140px;
+    height: 180px;
     overflow: hidden;
     background: #eee;
     border-radius: 2px;
@@ -1467,28 +1467,28 @@ textarea.form-control {
 
 /* Active animation state when envelope opens */
 .story-sheet-container.active .polaroid-1 {
-    left: 28%;
-    top: 40%;
+    left: 25%;
+    top: 38%;
     transform: translate(-50%, -50%) rotate(-10deg) scale(1);
     opacity: 1;
 }
 
 .story-sheet-container.active .polaroid-2 {
-    left: 68%;
-    top: 55%;
+    left: 70%;
+    top: 58%;
     transform: translate(-50%, -50%) rotate(10deg) scale(0.95);
     opacity: 1;
 }
 
 /* Polaroid 1 & 2 for centered final chapter layout */
 .story-sheet-container.active .align-center .polaroid-1 {
-    left: 32%;
+    left: 28%;
     top: 50%;
     transform: translate(-50%, -50%) rotate(-8deg) scale(1);
     opacity: 1;
 }
 .story-sheet-container.active .align-center .polaroid-2 {
-    left: 68%;
+    left: 72%;
     top: 50%;
     transform: translate(-50%, -50%) rotate(8deg) scale(0.95);
     opacity: 1;
@@ -1589,11 +1589,11 @@ textarea.form-control {
         height: 320px;
     }
     .polaroid-card {
-        width: 140px;
-        padding: 8px 8px 16px 8px;
+        width: 160px;
+        padding: 9px 9px 18px 9px;
     }
     .polaroid-img-wrapper {
-        height: 110px;
+        height: 130px;
     }
 }
 
@@ -1632,11 +1632,11 @@ textarea.form-control {
         height: 260px;
     }
     .polaroid-card {
-        width: 115px;
-        padding: 6px 6px 12px 6px;
+        width: 130px;
+        padding: 7px 7px 14px 7px;
     }
     .polaroid-img-wrapper {
-        height: 85px;
+        height: 100px;
     }
     .polaroid-caption {
         font-size: 0.95rem;
@@ -1647,11 +1647,11 @@ textarea.form-control {
     }
     
     .story-sheet-container.active .polaroid-1 {
-        left: 30%;
-        top: 45%;
+        left: 28%;
+        top: 42%;
     }
     .story-sheet-container.active .polaroid-2 {
-        left: 70%;
-        top: 55%;
+        left: 72%;
+        top: 58%;
     }
 }
