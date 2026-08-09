@@ -236,21 +236,29 @@ async function saveConfigToCloud(config) {
     }
 }
 
-async function uploadImageToStorage(file, path) {
-    if (!window.firebase || !firebase.storage) return null;
+async function uploadImageToImgBB(file) {
     try {
-        const storage = firebase.storage();
-        const ref = storage.ref(path);
-        // Compress first then upload as blob
-        const base64 = await compressImage(file, 900, 900, 0.80);
-        // Convert base64 dataURL to blob
-        const res = await fetch(base64);
-        const blob = await res.blob();
-        const snapshot = await ref.put(blob);
-        const url = await snapshot.ref.getDownloadURL();
-        return url;
+        const IMGBB_KEY = '807621f0434926f69cefb16aa72c3e03';
+        // Compress first
+        const base64 = await compressImage(file, 1200, 1200, 0.82);
+        // Strip the data:image/...;base64, prefix
+        const base64Data = base64.split(',')[1];
+        const formData = new FormData();
+        formData.append('key', IMGBB_KEY);
+        formData.append('image', base64Data);
+        const res = await fetch('https://api.imgbb.com/1/upload', {
+            method: 'POST',
+            body: formData
+        });
+        const json = await res.json();
+        if (json.success) {
+            return json.data.url;
+        } else {
+            console.warn('ImgBB upload failed', json);
+            return null;
+        }
     } catch (e) {
-        console.warn('Storage upload failed', e);
+        console.warn('ImgBB upload error', e);
         return null;
     }
 }
@@ -1663,13 +1671,12 @@ function initCustomizerEvents() {
             statusEl.textContent = '⏳ Uploading photo...';
 
             try {
-                const path = `chapters/photo_${Date.now()}_${file.name.replace(/[^a-z0-9.]/gi,'_')}`;
-                const url = await uploadImageToStorage(file, path);
+                const url = await uploadImageToImgBB(file);
                 if (url) {
                     preview.dataset.url = url;
-                    statusEl.textContent = '✅ Photo uploaded!';
+                    statusEl.textContent = '✅ Photo uploaded & will sync to all devices!';
                 } else {
-                    // Fallback to base64 if Storage fails
+                    // Fallback to base64 if ImgBB fails
                     const base64 = await compressImage(file, 800, 800, 0.70);
                     preview.dataset.base64 = base64;
                     statusEl.textContent = '⚠️ Saved locally (photos won\'t sync between devices)';
