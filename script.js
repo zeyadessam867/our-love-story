@@ -236,6 +236,25 @@ async function saveConfigToCloud(config) {
     }
 }
 
+async function uploadImageToStorage(file, path) {
+    if (!window.firebase || !firebase.storage) return null;
+    try {
+        const storage = firebase.storage();
+        const ref = storage.ref(path);
+        // Compress first then upload as blob
+        const base64 = await compressImage(file, 900, 900, 0.80);
+        // Convert base64 dataURL to blob
+        const res = await fetch(base64);
+        const blob = await res.blob();
+        const snapshot = await ref.put(blob);
+        const url = await snapshot.ref.getDownloadURL();
+        return url;
+    } catch (e) {
+        console.warn('Storage upload failed', e);
+        return null;
+    }
+}
+
 async function loadConfigFromCloud() {
     const doc = DB_DOC();
     if (!doc) return null;
@@ -1620,23 +1639,46 @@ function initCustomizerEvents() {
         });
     }
 
-    // Image file compression trigger
+    // Image file upload trigger — upload to Firebase Storage for cross-device sync
     const fileInput = document.getElementById('editChapterFile');
     if (fileInput) {
         fileInput.addEventListener('change', async (e) => {
             const file = e.target.files[0];
-            if (file) {
-                try {
-                    // Compress to max 800 width/height, 0.70 quality for low storage
+            if (!file) return;
+            const preview = document.getElementById('editChapterPreview');
+            // Show local preview immediately
+            const localUrl = URL.createObjectURL(file);
+            preview.src = localUrl;
+            preview.style.display = 'block';
+            preview.dataset.url = '';
+            preview.dataset.base64 = '';
+
+            const statusEl = document.getElementById('uploadStatus1') || (() => {
+                const s = document.createElement('small');
+                s.id = 'uploadStatus1';
+                s.style.color = 'var(--rose)';
+                fileInput.parentNode.appendChild(s);
+                return s;
+            })();
+            statusEl.textContent = '⏳ Uploading photo...';
+
+            try {
+                const path = `chapters/photo_${Date.now()}_${file.name.replace(/[^a-z0-9.]/gi,'_')}`;
+                const url = await uploadImageToStorage(file, path);
+                if (url) {
+                    preview.dataset.url = url;
+                    statusEl.textContent = '✅ Photo uploaded!';
+                } else {
+                    // Fallback to base64 if Storage fails
                     const base64 = await compressImage(file, 800, 800, 0.70);
-                    const preview = document.getElementById('editChapterPreview');
-                    preview.src = base64;
-                    preview.style.display = 'block';
                     preview.dataset.base64 = base64;
-                } catch (err) {
-                    console.error("Compression error", err);
-                    alert("Error loading photo, please select another file.");
+                    statusEl.textContent = '⚠️ Saved locally (photos won\'t sync between devices)';
                 }
+            } catch (err) {
+                console.error('Upload error', err);
+                statusEl.textContent = '❌ Upload failed. Using local fallback.';
+                const base64 = await compressImage(file, 800, 800, 0.70);
+                preview.dataset.base64 = base64;
             }
         });
     }
@@ -1662,7 +1704,8 @@ function initCustomizerEvents() {
             let image = '';
             if (document.getElementById('sourceUpload').checked) {
                 const preview = document.getElementById('editChapterPreview');
-                image = preview.dataset.base64 || preview.src;
+                // Prefer the Firebase Storage URL; fall back to base64
+                image = preview.dataset.url || preview.dataset.base64 || preview.src;
             } else {
                 image = document.getElementById('editChapterUrl').value.trim();
             }
