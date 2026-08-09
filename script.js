@@ -211,6 +211,56 @@ window.addEventListener('DOMContentLoaded', () => {
     initCustomizerEvents();
 });
 
+// === Firebase Firestore Helpers ===
+const DB_DOC = () => window.__db ? window.__db.collection('configs').doc('main') : null;
+
+async function saveConfigToCloud(config) {
+    const doc = DB_DOC();
+    if (!doc) return;
+    try {
+        // Firestore has a 1MB doc limit; store as a JSON string to keep it flat
+        await doc.set({ data: JSON.stringify(config) });
+    } catch (e) {
+        console.warn('Cloud save failed, falling back to localStorage', e);
+    }
+}
+
+async function loadConfigFromCloud() {
+    const doc = DB_DOC();
+    if (!doc) return null;
+    try {
+        const snap = await doc.get();
+        if (snap.exists && snap.data().data) {
+            return JSON.parse(snap.data().data);
+        }
+    } catch (e) {
+        console.warn('Cloud load failed', e);
+    }
+    return null;
+}
+
+function startRealtimeSync() {
+    const doc = DB_DOC();
+    if (!doc) return;
+    doc.onSnapshot(snap => {
+        if (!snap.exists || !snap.data().data) return;
+        try {
+            const remote = JSON.parse(snap.data().data);
+            // Only reload if it's a genuine remote change (different from what we last saved)
+            const localStr = localStorage.getItem('love_story_config');
+            if (localStr !== snap.data().data) {
+                localStorage.setItem('love_story_config', snap.data().data);
+                appConfig = remote;
+                applyConfig();
+                renderStory();
+                console.log('🔄 Synced from another device');
+            }
+        } catch (e) {
+            console.warn('Sync parse error', e);
+        }
+    });
+}
+
 function loadConfig() {
     const saved = localStorage.getItem('love_story_config');
     if (saved) {
@@ -232,6 +282,23 @@ function loadConfig() {
     if (!appConfig.chapters) appConfig.chapters = JSON.parse(JSON.stringify(DEFAULT_CONFIG.chapters));
 
     START_DATE = new Date(appConfig.startDate);
+
+    // Load latest from cloud and start listening for changes
+    loadConfigFromCloud().then(remote => {
+        if (remote) {
+            appConfig = remote;
+            if (!appConfig.startDate) appConfig.startDate = DEFAULT_CONFIG.startDate;
+            if (!appConfig.heroTitle) appConfig.heroTitle = DEFAULT_CONFIG.heroTitle;
+            if (!appConfig.heroTagline) appConfig.heroTagline = DEFAULT_CONFIG.heroTagline;
+            if (!appConfig.theme) appConfig.theme = JSON.parse(JSON.stringify(DEFAULT_CONFIG.theme));
+            if (!appConfig.chapters) appConfig.chapters = JSON.parse(JSON.stringify(DEFAULT_CONFIG.chapters));
+            START_DATE = new Date(appConfig.startDate);
+            localStorage.setItem('love_story_config', JSON.stringify(appConfig));
+            applyConfig();
+            renderStory();
+        }
+        startRealtimeSync();
+    });
 }
 
 function applyConfig() {
@@ -1501,6 +1568,7 @@ function initCustomizerEvents() {
             };
 
             localStorage.setItem('love_story_config', JSON.stringify(appConfig));
+            saveConfigToCloud(appConfig);
             location.reload();
         });
     }
@@ -1650,6 +1718,7 @@ function initCustomizerEvents() {
         resetBtn.addEventListener('click', () => {
             if (confirm("Restore original love story? All custom chapters and configurations will be deleted.")) {
                 localStorage.removeItem('love_story_config');
+                saveConfigToCloud(JSON.parse(JSON.stringify(DEFAULT_CONFIG)));
                 location.reload();
             }
         });
@@ -1682,6 +1751,7 @@ function initCustomizerEvents() {
                         if (parsed.startDate && parsed.theme && parsed.chapters) {
                             appConfig = parsed;
                             localStorage.setItem('love_story_config', JSON.stringify(appConfig));
+                            saveConfigToCloud(appConfig);
                             alert("Import successful! The page will now reload.");
                             location.reload();
                         } else {
