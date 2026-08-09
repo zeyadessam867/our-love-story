@@ -218,8 +218,19 @@ async function saveConfigToCloud(config) {
     const doc = DB_DOC();
     if (!doc) return;
     try {
-        // Firestore has a 1MB doc limit; store as a JSON string to keep it flat
-        await doc.set({ data: JSON.stringify(config) });
+        // Strip base64 images before upload — they're too large for Firestore's 1MB limit.
+        // Images remain in localStorage on each device; only text/settings sync.
+        const stripped = JSON.parse(JSON.stringify(config));
+        if (stripped.chapters) {
+            stripped.chapters = stripped.chapters.map(ch => {
+                const c = { ...ch };
+                if (c.image && c.image.startsWith('data:')) c.image = '';
+                if (c.image2 && c.image2.startsWith('data:')) c.image2 = '';
+                if (c.image3 && c.image3.startsWith('data:')) c.image3 = '';
+                return c;
+            });
+        }
+        await doc.set({ data: JSON.stringify(stripped) });
     } catch (e) {
         console.warn('Cloud save failed, falling back to localStorage', e);
     }
@@ -1696,6 +1707,12 @@ function initCustomizerEvents() {
             document.getElementById('chapterEditorForm').style.display = 'none';
             document.getElementById('chaptersListContainer').style.display = 'block';
             populateChaptersList();
+
+            // Persist to localStorage and sync to cloud
+            localStorage.setItem('love_story_config', JSON.stringify(appConfig));
+            saveConfigToCloud(appConfig);
+            applyConfig();
+            renderStory();
         });
     }
 
