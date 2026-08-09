@@ -1142,6 +1142,13 @@ textarea.form-control {
     font-size: 1.25rem;
     color: #fff;
 }
+.editor-section-title {
+    margin: 16px 0 8px;
+    font-family: var(--font-display);
+    font-size: 1rem;
+    color: var(--rose-light);
+    font-weight: 500;
+}
 .image-source-toggle {
     display: flex;
     gap: 16px;
@@ -1376,7 +1383,7 @@ textarea.form-control {
 .scrapbook-collage {
     position: relative;
     width: 100%;
-    height: 400px;
+    height: 580px;
     margin: 20px 0;
     pointer-events: auto;
     z-index: 22;
@@ -1384,10 +1391,10 @@ textarea.form-control {
 
 .polaroid-card {
     position: absolute;
-    width: 220px;
-    padding: 12px 12px 24px 12px;
+    width: 250px;
+    padding: 14px 14px 28px 14px;
     background: #fff;
-    box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+    box-shadow: 0 14px 35px rgba(0,0,0,0.25);
     border-radius: 4px;
     opacity: 0;
     left: 50%;
@@ -1400,7 +1407,7 @@ textarea.form-control {
 
 .polaroid-img-wrapper {
     width: 100%;
-    height: 180px;
+    height: 210px;
     overflow: hidden;
     background: #eee;
     border-radius: 2px;
@@ -1417,6 +1424,38 @@ textarea.form-control {
     color: #333;
     text-align: center;
     margin-top: 10px;
+}
+
+/* Quote polaroid (third white frame) */
+.polaroid-quote-inner {
+    background: #fafafa;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.polaroid-quote-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    padding: 14px 12px;
+    box-sizing: border-box;
+}
+
+.polaroid-quote-text {
+    font-family: var(--font-accent);
+    font-size: 1.05rem;
+    color: #5a4a42;
+    line-height: 1.35;
+    margin: 0;
+    text-align: center;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 5;
+    -webkit-box-orient: vertical;
 }
 
 /* Love Note style for Polaroid 2 */
@@ -1467,30 +1506,43 @@ textarea.form-control {
 
 /* Active animation state when envelope opens */
 .story-sheet-container.active .polaroid-1 {
-    left: 25%;
-    top: 38%;
+    left: 22%;
+    top: 32%;
     transform: translate(-50%, -50%) rotate(-10deg) scale(1);
     opacity: 1;
 }
 
 .story-sheet-container.active .polaroid-2 {
-    left: 70%;
-    top: 58%;
+    left: 78%;
+    top: 32%;
     transform: translate(-50%, -50%) rotate(10deg) scale(0.95);
     opacity: 1;
 }
 
-/* Polaroid 1 & 2 for centered final chapter layout */
+.story-sheet-container.active .polaroid-3 {
+    left: 50%;
+    top: 68%;
+    transform: translate(-50%, -50%) rotate(-2deg) scale(0.98);
+    opacity: 1;
+}
+
+/* Polaroid layout for centered final chapter */
 .story-sheet-container.active .align-center .polaroid-1 {
-    left: 28%;
-    top: 50%;
+    left: 22%;
+    top: 38%;
     transform: translate(-50%, -50%) rotate(-8deg) scale(1);
     opacity: 1;
 }
 .story-sheet-container.active .align-center .polaroid-2 {
-    left: 72%;
-    top: 50%;
+    left: 78%;
+    top: 38%;
     transform: translate(-50%, -50%) rotate(8deg) scale(0.95);
+    opacity: 1;
+}
+.story-sheet-container.active .align-center .polaroid-3 {
+    left: 50%;
+    top: 72%;
+    transform: translate(-50%, -50%) rotate(-2deg) scale(0.98);
     opacity: 1;
 }
 
@@ -1506,6 +1558,10 @@ textarea.form-control {
 
 .story-sheet-container.active .polaroid-2:hover {
     transform: translate(-50%, -50%) rotate(4deg) scale(1.1) !important;
+}
+
+.story-sheet-container.active .polaroid-3:hover {
+    transform: translate(-50%, -50%) rotate(0deg) scale(1.08) !important;
 }
 
 /* The actual letter content wrapper */
@@ -1586,14 +1642,14 @@ textarea.form-control {
 /* Mobile Responsive adjustments for Envelope transitions */
 @media (max-width: 992px) {
     .scrapbook-collage {
-        height: 320px;
+        height: 460px;
     }
     .polaroid-card {
-        width: 160px;
-        padding: 9px 9px 18px 9px;
+        width: 185px;
+        padding: 10px 10px 20px 10px;
     }
     .polaroid-img-wrapper {
-        height: 130px;
+        height: 155px;
     }
 }
 
@@ -1629,14 +1685,14 @@ textarea.form-control {
     }
     
     .scrapbook-collage {
-        height: 260px;
+        height: 390px;
     }
     .polaroid-card {
-        width: 130px;
-        padding: 7px 7px 14px 7px;
+        width: 145px;
+        padding: 8px 8px 16px 8px;
     }
     .polaroid-img-wrapper {
-        height: 100px;
+        height: 115px;
     }
     .polaroid-caption {
         font-size: 0.95rem;
@@ -1646,12 +1702,21 @@ textarea.form-control {
         font-size: 0.85rem;
     }
     
+    .polaroid-quote-text {
+        font-size: 0.9rem;
+        -webkit-line-clamp: 4;
+    }
+    
     .story-sheet-container.active .polaroid-1 {
-        left: 28%;
-        top: 42%;
+        left: 22%;
+        top: 30%;
     }
     .story-sheet-container.active .polaroid-2 {
-        left: 72%;
-        top: 58%;
+        left: 78%;
+        top: 30%;
+    }
+    .story-sheet-container.active .polaroid-3 {
+        left: 50%;
+        top: 72%;
     }
 }
