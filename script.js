@@ -15,8 +15,6 @@ const DEFAULT_CHAPTERS = [
             "And just like that, my world changed forever."
         ],
         image: "images/chapter_beginning.png",
-        image2: "images/chapter_beginning_2.png",
-        image3: "images/chapter_beginning.png",
         alignment: "left",
         accent: "210, 140, 255",
         transSymbol: "♡",
@@ -33,8 +31,6 @@ const DEFAULT_CHAPTERS = [
             "That spark between us? It wasn't just a flame. It was a whole galaxy igniting."
         ],
         image: "images/chapter_first_spark.png",
-        image2: "images/chapter_first_spark_2.png",
-        image3: "images/chapter_first_spark.png",
         alignment: "right",
         accent: "255, 150, 200",
         transSymbol: "∞",
@@ -51,8 +47,6 @@ const DEFAULT_CHAPTERS = [
             "You became my favorite notification, my best thought, and the reason behind my most genuine smiles. <em>Loving you was the easiest thing I've ever done.</em>"
         ],
         image: "images/chapter_falling_love.png",
-        image2: "images/chapter_falling_love_2.png",
-        image3: "images/chapter_falling_love.png",
         alignment: "left",
         accent: "255, 180, 220",
         transSymbol: "🌱",
@@ -69,8 +63,6 @@ const DEFAULT_CHAPTERS = [
             "Every challenge we faced only proved that <em>together, we are unstoppable.</em>"
         ],
         image: "images/chapter_growing.png",
-        image2: "images/chapter_growing_2.png",
-        image3: "images/chapter_growing.png",
         alignment: "right",
         accent: "150, 220, 180",
         transSymbol: "🌅",
@@ -87,8 +79,6 @@ const DEFAULT_CHAPTERS = [
             "You turned my everyday life into the greatest adventure story ever told."
         ],
         image: "images/chapter_adventures.png",
-        image2: "images/chapter_adventures_2.png",
-        image3: "images/chapter_adventures.png",
         alignment: "left",
         accent: "255, 180, 120",
         transSymbol: "💫",
@@ -104,8 +94,6 @@ const DEFAULT_CHAPTERS = [
             "...know that every tick is a heartbeat dedicated to you. Every second is a whisper that says <em>\"I choose you.\"</em>"
         ],
         image: "images/chapter_forever.png",
-        image2: "images/chapter_forever_2.png",
-        image3: "images/chapter_forever.png",
         alignment: "center",
         accent: "207, 156, 180",
         isFinal: true
@@ -243,14 +231,6 @@ function loadConfig() {
     if (!appConfig.theme) appConfig.theme = JSON.parse(JSON.stringify(DEFAULT_CONFIG.theme));
     if (!appConfig.chapters) appConfig.chapters = JSON.parse(JSON.stringify(DEFAULT_CONFIG.chapters));
 
-    // Migrate chapters: ensure every chapter has three images
-    appConfig.chapters.forEach((ch, i) => {
-        const defaults = DEFAULT_CHAPTERS[i] || {};
-        if (!ch.image && defaults.image) ch.image = defaults.image;
-        if (!ch.image2) ch.image2 = defaults.image2 || ch.image || '';
-        if (!ch.image3) ch.image3 = defaults.image3 || ch.image || '';
-    });
-
     START_DATE = new Date(appConfig.startDate);
 }
 
@@ -286,17 +266,6 @@ function applyConfig() {
     updateDynamicDOMReferences();
     initSectionParticles();
     initAnimationsAndObservers();
-}
-
-function renderPhoto3Polaroid(ch, caption) {
-    const src = ch.image3 || ch.image || '';
-    return `
-        <div class="polaroid-card polaroid-3">
-            <div class="polaroid-img-wrapper">
-                <img src="${src}" alt="${ch.title} — Photo 3">
-            </div>
-            <div class="polaroid-caption">${caption}</div>
-        </div>`;
 }
 
 function renderStory(chapters) {
@@ -367,22 +336,28 @@ function renderStory(chapters) {
                                 <div class="story-content final-content" style="display: flex; flex-direction: column; align-items: center; gap: 30px;">
                                     <!-- Scrapbook Collage (Centered) -->
                                     <div class="scrapbook-collage align-center">
+                                        <!-- Polaroid 1: Main Photo -->
                                         <div class="polaroid-card polaroid-1">
                                             <div class="polaroid-img-wrapper">
-                                                <img src="${ch.image}" alt="${ch.title} — Photo 1">
+                                                <img src="${ch.image}" alt="${ch.title}">
                                             </div>
                                             <div class="polaroid-caption">${ch.label || 'Forever'}</div>
                                         </div>
+                                        <!-- Polaroid 2: Love Note -->
                                         <div class="polaroid-card polaroid-2">
-                                            <div class="polaroid-img-wrapper">
-                                                <img src="${ch.image2 || ch.image}" alt="${ch.title} — Photo 2">
+                                            <div class="polaroid-img-wrapper love-note-bg">
+                                                <div class="love-note-content">
+                                                    <span class="note-stamp">🌸</span>
+                                                    <p class="note-text">"Every tick of this clock is a heartbeat dedicated to you."</p>
+                                                    <span class="note-signature">♥</span>
+                                                </div>
                                             </div>
-                                            <div class="polaroid-caption">Our Moments</div>
+                                            <div class="polaroid-caption">Forever Yours</div>
                                         </div>
-                                        ${renderPhoto3Polaroid(ch, ch.quoteCaption || 'Forever Yours')}
                                     </div>
 
                                     <div class="story-text final-text" style="width: 100%; text-align: center;">
+                                        ${ch.quote ? `<p class="story-quote final-quote">"${ch.quote}"</p>` : ''}
                                         ${ch.paragraphs.map(p => `<p>${p}</p>`).join('')}
                                         
                                         <div class="mini-counter">
@@ -446,19 +421,24 @@ function renderStory(chapters) {
                                 <div class="story-content ${reverseClass}">
                                     <!-- Scrapbook Collage (Photos side-by-side with words) -->
                                     <div class="scrapbook-collage">
+                                        <!-- Polaroid 1: Main Photo -->
                                         <div class="polaroid-card polaroid-1">
                                             <div class="polaroid-img-wrapper">
-                                                <img src="${ch.image}" alt="${ch.title} — Photo 1">
+                                                <img src="${ch.image}" alt="${ch.title}">
                                             </div>
                                             <div class="polaroid-caption">${ch.label || ('Chapter ' + sectionNum)}</div>
                                         </div>
+                                        <!-- Polaroid 2: Love Note -->
                                         <div class="polaroid-card polaroid-2">
-                                            <div class="polaroid-img-wrapper">
-                                                <img src="${ch.image2 || ch.image}" alt="${ch.title} — Photo 2">
+                                            <div class="polaroid-img-wrapper love-note-bg">
+                                                <div class="love-note-content">
+                                                    <span class="note-stamp">🌸</span>
+                                                    <p class="note-text">${ch.quote ? `"${ch.quote}"` : 'You are my absolute favorite memory.'}</p>
+                                                    <span class="note-signature">♥</span>
+                                                </div>
                                             </div>
-                                            <div class="polaroid-caption">Our Moments</div>
+                                            <div class="polaroid-caption">Forever & Always</div>
                                         </div>
-                                        ${renderPhoto3Polaroid(ch, ch.quoteCaption || 'Our Moments')}
                                     </div>
                                     <div class="story-text">
                                         ${ch.paragraphs.map(p => `<p>${p}</p>`).join('')}
@@ -1406,94 +1386,6 @@ function compressImage(file, maxWidth, maxHeight, quality) {
     });
 }
 
-function setupChapterImageInput(fileInputId, previewId, uploadRadioId, urlRadioId, uploadGroupId, urlGroupId) {
-    const fileInput = document.getElementById(fileInputId);
-    const preview = document.getElementById(previewId);
-    const uploadRadio = document.getElementById(uploadRadioId);
-    const urlRadio = document.getElementById(urlRadioId);
-    const uploadGroup = document.getElementById(uploadGroupId);
-    const urlGroup = document.getElementById(urlGroupId);
-
-    if (uploadRadio && urlRadio) {
-        uploadRadio.addEventListener('change', () => {
-            uploadGroup.style.display = 'block';
-            urlGroup.style.display = 'none';
-        });
-        urlRadio.addEventListener('change', () => {
-            uploadGroup.style.display = 'none';
-            urlGroup.style.display = 'block';
-        });
-    }
-
-    if (fileInput && preview) {
-        fileInput.addEventListener('change', async (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                try {
-                    const base64 = await compressImage(file, 800, 800, 0.70);
-                    preview.src = base64;
-                    preview.style.display = 'block';
-                    preview.dataset.base64 = base64;
-                } catch (err) {
-                    console.error("Compression error", err);
-                    alert("Error loading photo, please select another file.");
-                }
-            }
-        });
-    }
-}
-
-function getChapterImageFromEditor(slot) {
-    const preview = document.getElementById(`editChapterPreview${slot}`);
-    const uploadRadio = document.getElementById(`sourceUpload${slot}`);
-    if (uploadRadio && uploadRadio.checked) {
-        return preview.dataset.base64 || preview.src || '';
-    }
-    const urlVal = document.getElementById(`editChapterUrl${slot}`).value.trim();
-    return urlVal || preview.src || '';
-}
-
-function loadChapterImageIntoEditor(slot, imageSrc) {
-    const preview = document.getElementById(`editChapterPreview${slot}`);
-    const fileInput = document.getElementById(`editChapterFile${slot}`);
-    const urlInput = document.getElementById(`editChapterUrl${slot}`);
-    const uploadRadio = document.getElementById(`sourceUpload${slot}`);
-    const urlRadio = document.getElementById(`sourceUrl${slot}`);
-    const uploadGroup = document.getElementById(`imgUploadGroup${slot}`);
-    const urlGroup = document.getElementById(`imgUrlGroup${slot}`);
-
-    fileInput.value = '';
-    preview.dataset.base64 = '';
-
-    if (imageSrc) {
-        preview.src = imageSrc;
-        preview.style.display = 'block';
-        if (imageSrc.startsWith('data:')) {
-            uploadRadio.checked = true;
-            uploadGroup.style.display = 'block';
-            urlGroup.style.display = 'none';
-            urlInput.value = '';
-        } else {
-            urlRadio.checked = true;
-            uploadGroup.style.display = 'none';
-            urlGroup.style.display = 'block';
-            urlInput.value = imageSrc;
-        }
-    } else {
-        preview.style.display = 'none';
-        preview.src = '';
-        uploadRadio.checked = true;
-        uploadGroup.style.display = 'block';
-        urlGroup.style.display = 'none';
-        urlInput.value = '';
-    }
-}
-
-function resetChapterImageEditors() {
-    loadChapterImageIntoEditor(1, '');
-    loadChapterImageIntoEditor(2, '');
-}
-
 /* ========================================================
    CUSTOMIZER DASHBOARD CODE
    ======================================================== */
@@ -1632,10 +1524,43 @@ function initCustomizerEvents() {
         });
     });
 
-    // Chapter image inputs (Photo 1, Photo 2 & Photo 3)
-    setupChapterImageInput('editChapterFile1', 'editChapterPreview1', 'sourceUpload1', 'sourceUrl1', 'imgUploadGroup1', 'imgUrlGroup1');
-    setupChapterImageInput('editChapterFile2', 'editChapterPreview2', 'sourceUpload2', 'sourceUrl2', 'imgUploadGroup2', 'imgUrlGroup2');
-    setupChapterImageInput('editChapterFile3', 'editChapterPreview3', 'sourceUpload3', 'sourceUrl3', 'imgUploadGroup3', 'imgUrlGroup3');
+    // Image Source radio buttons
+    const sourceUpload = document.getElementById('sourceUpload');
+    const sourceUrl = document.getElementById('sourceUrl');
+    const uploadGroup = document.getElementById('imgUploadGroup');
+    const urlGroup = document.getElementById('imgUrlGroup');
+
+    if (sourceUpload && sourceUrl) {
+        sourceUpload.addEventListener('change', () => {
+            uploadGroup.style.display = 'block';
+            urlGroup.style.display = 'none';
+        });
+        sourceUrl.addEventListener('change', () => {
+            uploadGroup.style.display = 'none';
+            urlGroup.style.display = 'block';
+        });
+    }
+
+    // Image file compression trigger
+    const fileInput = document.getElementById('editChapterFile');
+    if (fileInput) {
+        fileInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                try {
+                    // Compress to max 800 width/height, 0.70 quality for low storage
+                    const base64 = await compressImage(file, 800, 800, 0.70);
+                    const preview = document.getElementById('editChapterPreview');
+                    preview.src = base64;
+                    preview.style.display = 'block';
+                    preview.dataset.base64 = base64;
+                } catch (err) {
+                    console.error("Compression error", err);
+                    alert("Error loading photo, please select another file.");
+                }
+            }
+        });
+    }
 
     // Save individual chapter
     const btnSaveChapter = document.getElementById('btnSaveChapter');
@@ -1645,7 +1570,6 @@ function initCustomizerEvents() {
             const label = document.getElementById('editChapterLabel').value.trim();
             const title = document.getElementById('editChapterTitle').value.trim();
             const quote = document.getElementById('editChapterQuote').value.trim();
-            const quoteCaption = document.getElementById('editChapterQuoteCaption').value.trim();
             const paragraphs = document.getElementById('editChapterParagraphs').value
                 .split('\n')
                 .map(p => p.trim())
@@ -1656,20 +1580,20 @@ function initCustomizerEvents() {
             const transSymbol = document.getElementById('editChapterTransSymbol').value.trim();
             const transText = document.getElementById('editChapterTransText').value.trim();
 
-            const image = getChapterImageFromEditor(1);
-            const image2 = getChapterImageFromEditor(2);
-            const image3 = getChapterImageFromEditor(3) || image;
+            let image = '';
+            if (document.getElementById('sourceUpload').checked) {
+                const preview = document.getElementById('editChapterPreview');
+                image = preview.dataset.base64 || preview.src;
+            } else {
+                image = document.getElementById('editChapterUrl').value.trim();
+            }
 
             if (!title) {
                 alert("Please enter a chapter title.");
                 return;
             }
             if (!image) {
-                alert("Please select or enter a URL for Photo 1.");
-                return;
-            }
-            if (!image2) {
-                alert("Please select or enter a URL for Photo 2.");
+                alert("Please select a file or enter an image URL.");
                 return;
             }
 
@@ -1677,11 +1601,8 @@ function initCustomizerEvents() {
                 label,
                 title,
                 quote,
-                quoteCaption,
                 paragraphs,
                 image,
-                image2,
-                image3,
                 alignment,
                 accent,
                 transSymbol,
@@ -1888,12 +1809,17 @@ function openChapterEditor(idx) {
     const editLabel = document.getElementById('editChapterLabel');
     const editTitle = document.getElementById('editChapterTitle');
     const editQuote = document.getElementById('editChapterQuote');
-    const editQuoteCaption = document.getElementById('editChapterQuoteCaption');
     const editParagraphs = document.getElementById('editChapterParagraphs');
     const editAlignment = document.getElementById('editChapterAlignment');
     const editAccent = document.getElementById('editChapterAccent');
     const editTransSymbol = document.getElementById('editChapterTransSymbol');
     const editTransText = document.getElementById('editChapterTransText');
+    const preview = document.getElementById('editChapterPreview');
+    const fileInput = document.getElementById('editChapterFile');
+    const urlInput = document.getElementById('editChapterUrl');
+    
+    fileInput.value = '';
+    preview.dataset.base64 = '';
 
     if (idx >= 0) {
         const ch = appConfig.chapters[idx];
@@ -1902,16 +1828,30 @@ function openChapterEditor(idx) {
         editLabel.value = ch.label || '';
         editTitle.value = ch.title || '';
         editQuote.value = ch.quote || '';
-        editQuoteCaption.value = ch.quoteCaption || (ch.isFinal ? 'Forever Yours' : 'Forever & Always');
         editParagraphs.value = ch.paragraphs.join('\n');
         editAlignment.value = ch.alignment || 'left';
         editAccent.value = ch.accent || '207, 156, 180';
         editTransSymbol.value = ch.transSymbol || '';
         editTransText.value = ch.transText || '';
 
-        loadChapterImageIntoEditor(1, ch.image || '');
-        loadChapterImageIntoEditor(2, ch.image2 || ch.image || '');
-        loadChapterImageIntoEditor(3, ch.image3 || ch.image || '');
+        // Load image
+        if (ch.image) {
+            preview.src = ch.image;
+            preview.style.display = 'block';
+            if (ch.image.startsWith('data:')) {
+                document.getElementById('sourceUpload').checked = true;
+                document.getElementById('imgUploadGroup').style.display = 'block';
+                document.getElementById('imgUrlGroup').style.display = 'none';
+                urlInput.value = '';
+            } else {
+                document.getElementById('sourceUrl').checked = true;
+                document.getElementById('imgUploadGroup').style.display = 'none';
+                document.getElementById('imgUrlGroup').style.display = 'block';
+                urlInput.value = ch.image;
+            }
+        } else {
+            preview.style.display = 'none';
+        }
 
         // Lock position for final chapter
         if (ch.isFinal) {
@@ -1929,16 +1869,17 @@ function openChapterEditor(idx) {
         editLabel.value = `Chapter ${appConfig.chapters.length}`;
         editTitle.value = '';
         editQuote.value = '';
-        editQuoteCaption.value = 'Forever & Always';
         editParagraphs.value = '';
         editAlignment.value = 'left';
         editAccent.value = '207, 156, 180';
         editTransSymbol.value = '♡';
         editTransText.value = 'Together, another beautiful moment...';
-
-        resetChapterImageEditors();
-        // also reset slot 3
-        loadChapterImageIntoEditor(3, '');
+        
+        preview.style.display = 'none';
+        document.getElementById('sourceUpload').checked = true;
+        document.getElementById('imgUploadGroup').style.display = 'block';
+        document.getElementById('imgUrlGroup').style.display = 'none';
+        urlInput.value = '';
         editAlignment.disabled = false;
         editTransSymbol.disabled = false;
         editTransText.disabled = false;
